@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- สำคัญมาก: ป้องกันไม่ให้ส่ง Referer ไปที่ Shopee CDN เพื่อไม่ให้ติดบล็อก Hotlink 403 -->
+  <meta name="referrer" content="no-referrer">
+  <title>OVERX — E-Commerce & Affiliate Intelligence</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'Prompt', 'sans-serif'],
+            mono: ['"Geist Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #000000;
+      color: #f5f5f5;
+      font-family: 'Geist', 'Prompt', sans-serif;
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #080808; }
+    ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #404040; }
+  </style>
+</head>
+<body class="bg-black text-neutral-100 min-h-screen flex antialiased">
+
+  <!-- DEMO BANNER -->
+  <div class="fixed bottom-0 inset-x-0 z-50 bg-amber-400 text-black text-center text-xs font-mono font-semibold py-1.5 px-3">
+    DEMO — ข้อมูลทั้งหมดในหน้านี้เป็นตัวอย่างเพื่อทดสอบระบบ ไม่ใช่ข้อมูลจริงจาก Shopee/TikTok Shop
+  </div>
+
+
+  <!-- LEFT SIDEBAR (Dropship.io Style) -->
+  <aside class="w-64 border-r border-[#1a1a1a] bg-[#050505] hidden lg:flex flex-col justify-between shrink-0 select-none">
+    <div class="p-6 space-y-8">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <img src="/logo.png" alt="OVERX Logo" class="h-9 w-9 object-contain invert-0 brightness-110">
+        <div>
+          <span class="font-extrabold tracking-widest text-lg text-white font-mono">OVERX</span>
+          <span class="block text-[10px] text-neutral-500 font-mono tracking-wider">INTELLIGENCE</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="space-y-1.5 text-xs font-medium">
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg bg-neutral-900 text-white border border-neutral-800 transition">
+          <i data-lucide="scan" class="w-4 h-4 text-white"></i> Product Inspector
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-900/60 transition">
+          <i data-lucide="trending-up" class="w-4 h-4"></i> Sales Velocity
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-900/60 transition">
+          <i data-lucide="percent" class="w-4 h-4"></i> Commission Hub
+        </a>
+        <a href="#gallerySection" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-900/60 transition">
+          <i data-lucide="images" class="w-4 h-4"></i> Image Gallery
+        </a>
+      </nav>
+    </div>
+
+    <!-- Bottom Status -->
+    <div class="p-6 border-t border-[#1a1a1a] text-xs text-neutral-500 space-y-3">
+      <div class="flex items-center justify-between font-mono text-[11px]">
+        <span class="flex items-center gap-2 text-neutral-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM READY
+        </span>
+        <span class="text-neutral-600">v2.6</span>
+      </div>
+      <div class="p-3 rounded-lg bg-neutral-950 border border-neutral-900 text-[11px] space-y-1 font-mono">
+        <div class="text-neutral-300 font-medium">Shopee & TikTok Intelligence</div>
+        <div class="text-neutral-500 text-[10px]">Anti-hotlink Bypass Enabled</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <div class="flex-1 flex flex-col min-w-0 bg-black">
+
+    <!-- TOP HEADER -->
+    <header class="h-16 border-b border-[#1a1a1a] px-6 flex items-center justify-between bg-black/90 sticky top-0 z-40 backdrop-blur">
+      <div class="flex items-center gap-3 lg:hidden">
+        <img src="/logo.png" alt="OVERX Logo" class="h-7 w-7 object-contain">
+        <span class="font-extrabold tracking-widest text-white font-mono">OVERX</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 rounded bg-[#111111] border border-[#222222] text-[11px] font-mono text-neutral-300 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-white"></span> SHOPEE TH
+        </span>
+        <span class="px-2.5 py-1 rounded bg-transparent border border-neutral-800 text-[11px] font-mono text-neutral-500 flex items-center gap-1.5">
+          TIKTOK SHOP TH
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs font-mono text-neutral-400">
+        <span class="hidden sm:inline">Press Enter to Inspect</span>
+      </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+
+      <!-- DROPSHIP.IO HERO SEARCH BAR (Quick Test Buttons Removed) -->
+      <section class="space-y-3">
+        <div class="space-y-1">
+          <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
+            Product & Inventory Tracker
+          </h1>
+          <p class="text-xs text-neutral-400">
+            Paste any Shopee or TikTok Shop product link to inspect inventory, stock breakdown per variation, and sales velocity.
+          </p>
+        </div>
+
+        <!-- Input Box -->
+        <div class="flex flex-col sm:flex-row gap-2 p-1.5 rounded-xl bg-[#0a0a0a] border border-[#222222] focus-within:border-neutral-500 transition">
+          <div class="flex-1 flex items-center gap-3 px-3 py-2">
+            <i data-lucide="search" class="w-4 h-4 text-neutral-500 shrink-0"></i>
+            <input 
+              id="urlInput"
+              type="text" 
+              onkeydown="if(event.key==='Enter') handleCheckProduct()"
+              placeholder="Paste any Shopee or TikTok Shop product link..."
+              class="w-full bg-transparent text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none font-mono"
+            >
+          </div>
+          <button 
+            id="btnCheck"
+            onclick="handleCheckProduct()"
+            class="px-6 py-2.5 rounded-lg bg-white text-black font-semibold text-xs tracking-wide hover:bg-neutral-200 transition active:scale-98 flex items-center justify-center gap-2 shrink-0 font-mono"
+          >
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-black"></i> INSPECT
+          </button>
+        </div>
+      </section>
+
+      <!-- SPINNER -->
+      <div id="loadingState" class="hidden py-16 text-center space-y-3">
+        <div class="inline-block w-7 h-7 border-2 border-neutral-800 border-t-white rounded-full animate-spin"></div>
+        <div class="text-xs font-mono text-neutral-500 uppercase tracking-widest">Extracting Real Images, Reviews & Commission...</div>
+      </div>
+
+      <!-- MAIN DATA CONTAINER -->
+      <div id="resultSection" class="space-y-6">
+
+        <!-- 5 EXPANDED METRIC CARDS (Ratings, Reviews, Commission, Price, Stock) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+          
+          <!-- Rating & Reviews -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-1.5">
+            <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+              <i data-lucide="star" class="w-3 h-3 text-amber-400 fill-amber-400"></i> Rating & Reviews
+            </div>
+            <div id="metricRating" class="text-lg font-bold font-mono text-white flex items-center gap-1.5">
+              4.93 <span class="text-xs font-normal text-amber-400">★</span>
+            </div>
+            <div id="metricReviews" class="text-[11px] text-neutral-500 font-mono">104,107 รีวิว</div>
+          </div>
+
+          <!-- Price & Discount -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-1.5">
+            <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">Current Price</div>
+            <div id="metricPrice" class="text-lg font-bold font-mono text-white">
+              ฿617.00
+            </div>
+            <div id="metricDiscount" class="text-[11px] text-neutral-400 font-mono">-26% OFF</div>
+          </div>
+
+          <!-- Commission Rate & Earnings -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-1.5">
+            <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">Affiliate Comm.</div>
+            <div id="metricCommission" class="text-lg font-bold font-mono text-white">
+              10.0%
+            </div>
+            <div id="metricEarnings" class="text-[11px] text-emerald-400 font-mono">+ ฿61.70 / order</div>
+          </div>
+
+          <!-- Total Historical Sold -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-1.5">
+            <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">Historical Sold</div>
+            <div id="metricSold" class="text-lg font-bold font-mono text-white">
+              250,000+
+            </div>
+            <div class="text-[11px] text-neutral-500 font-mono">ชิ้นขายแล้วทั้งหมด</div>
+          </div>
+
+          <!-- Inventory Status -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-1.5 col-span-2 md:col-span-1">
+            <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">In-Stock SKUs</div>
+            <div id="metricVariations" class="text-lg font-bold font-mono text-white">
+              10 / 16
+            </div>
+            <div id="metricVariationsSub" class="text-[11px] text-neutral-500 font-mono">6 Sold Out</div>
+          </div>
+
+        </div>
+
+        <!-- PRODUCT OVERVIEW & VARIATION MATRIX -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Product Details Card -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-6 rounded-xl space-y-5 lg:col-span-1 flex flex-col justify-between">
+            <div class="space-y-4">
+              <!-- Main Thumbnail Preview -->
+              <div class="aspect-square bg-black border border-[#222222] rounded-lg overflow-hidden flex items-center justify-center relative group">
+                <img id="productImage" referrerpolicy="no-referrer" src="https://down-th.img.susercontent.com/file/th-11134207-81zth-mnjucg93ekud33" alt="Product" class="object-cover w-full h-full opacity-95 group-hover:scale-105 transition duration-300">
+                <span id="badgeShopType" class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-black/80 border border-neutral-700 text-[10px] font-mono text-neutral-200">
+                  SHOPEE MALL
+                </span>
+                <span id="badgeDiscount" class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-neutral-100 text-black font-mono font-bold text-[10px]">
+                  -26%
+                </span>
+              </div>
+
+              <!-- Metadata -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-xs text-neutral-500 font-mono">
+                  <span id="productBrand" class="text-neutral-300 font-semibold">Downy(ดาวน์นี่)</span>
+                  <span id="productLocation">สมุทรปราการ</span>
+                </div>
+                <h3 id="productTitle" class="text-sm font-semibold text-neutral-100 leading-snug line-clamp-2">
+                  [ซื้อ 4 แถม 2] Downy ดาวน์นี่ น้ำยาปรับผ้านุ่มสูตรเข้มข้น ถุงเติม สูตรน้ำหอมพรีเมี่ยม 950ml x 6 แพ็ค
+                </h3>
+                <p id="productCategory" class="text-[11px] text-neutral-500 font-mono line-clamp-1">
+                  เครื่องใช้ในบ้าน > ผลิตภัณฑ์ซักรีด > น้ำยาปรับผ้านุ่ม
+                </p>
+              </div>
+
+              <!-- Identifiers -->
+              <div class="p-3 rounded-lg bg-[#050505] border border-[#1c1c1c] space-y-1.5 font-mono text-xs">
+                <div class="flex justify-between text-neutral-400">
+                  <span>Shop ID:</span>
+                  <span id="shopIdVal" class="text-white">78382981</span>
+                </div>
+                <div class="flex justify-between text-neutral-400">
+                  <span>Item ID:</span>
+                  <span id="itemIdVal" class="text-white">4961013500</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="toggleWatchlist()" id="btnWatchlist" class="w-full py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-700 text-xs font-mono font-semibold flex items-center justify-center gap-2 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> TRACK THIS PRODUCT
+            </button>
+          </div>
+
+          <!-- Variation Stock Table (Dropship.io Detailed Table) -->
+          <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-6 rounded-xl space-y-4 lg:col-span-2 flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-[#1c1c1c]">
+              <div>
+                <h2 id="variationHeaderTitle" class="text-sm font-bold text-white font-mono uppercase tracking-wider">
+                  SKU Inventory Breakdown
+                </h2>
+                <p class="text-xs text-neutral-500">Live availability status per individual variation</p>
+              </div>
+              <div class="text-xs font-mono flex items-center gap-3">
+                <span class="text-neutral-300">In Stock: <strong id="inStockCount" class="text-white">10</strong></span>
+                <span class="text-neutral-600">|</span>
+                <span class="text-neutral-500">Out of Stock: <strong id="outStockCount" class="text-neutral-400">6</strong></span>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto overflow-y-auto max-h-[380px] -mx-6 px-6">
+              <table class="w-full text-left text-xs font-mono">
+                <thead>
+                  <tr class="text-neutral-500 border-b border-[#1c1c1c] pb-2">
+                    <th class="py-2.5 font-medium">#</th>
+                    <th class="py-2.5 font-medium">VARIATION / OPTION</th>
+                    <th class="py-2.5 font-medium">STATUS</th>
+                    <th class="py-2.5 font-medium text-right">STOCK</th>
+                  </tr>
+                </thead>
+                <tbody id="variationTableBody" class="divide-y divide-[#171717]">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- NEW: ALL PRODUCT IMAGES GALLERY (ดูรูปภาพสินค้าทั้งหมดว่ามีอะไรบ้าง) -->
+        <div id="gallerySection" class="bg-[#0a0a0a] border border-[#1f1f1f] p-6 rounded-xl space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-[#1c1c1c]">
+            <div>
+              <h2 class="text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="images" class="w-4 h-4 text-neutral-400"></i> All Product Images & Media Assets
+              </h2>
+              <p class="text-xs text-neutral-500">คลิกที่รูปด้านล่างเพื่อสลับดูภาพขนาดใหญ่ของสินค้า</p>
+            </div>
+            <span id="galleryCountBadge" class="px-2.5 py-1 rounded bg-[#141414] border border-neutral-800 text-xs font-mono text-neutral-300">
+              0 Images Found
+            </span>
+          </div>
+
+          <!-- Image Grid -->
+          <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 pt-2">
+            <!-- Dynamically populated images -->
+          </div>
+        </div>
+
+        <!-- DROPSHIP.IO SALES VELOCITY CHART -->
+        <div class="bg-[#0a0a0a] border border-[#1f1f1f] p-6 rounded-xl space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-[#1c1c1c]">
+            <div>
+              <h2 class="text-sm font-bold text-white font-mono uppercase tracking-wider">
+                Sales Velocity & Stock Depletion (7-Day Run Rate)
+              </h2>
+              <p class="text-xs text-neutral-500">Estimated daily conversions and inventory depletion trajectory</p>
+            </div>
+            <span id="chartRunRateTag" class="px-2.5 py-1 rounded bg-[#141414] border border-neutral-800 text-xs font-mono text-neutral-300">
+              Avg. 48 units / day
+            </span>
+          </div>
+
+          <div class="h-64 w-full">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- MINIMAL FOOTER -->
+    <footer class="border-t border-[#1a1a1a] py-6 px-8 text-center text-xs text-neutral-600 font-mono">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <span>OVERX INTELLIGENCE PLATFORM</span>
+        <span>SHOPEE & TIKTOK SHOP PRODUCT RESEARCH</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    let chartInstance = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      // Initial Load with Downy URL
+      document.getElementById("urlInput").value = "https://shopee.co.th/product/78382981/4961013500";
+      handleCheckProduct();
+    });
+
+    async function handleCheckProduct() {
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url) return;
+
+      document.getElementById("loadingState").classList.remove("hidden");
+      document.getElementById("resultSection").classList.add("hidden");
+
+      try {
+        const resp = await fetch("/api/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        const data = await resp.json();
+
+        document.getElementById("loadingState").classList.add("hidden");
+        document.getElementById("resultSection").classList.remove("hidden");
+
+        if (data) {
+          renderData(data);
+        }
+      } catch (err) {
+        console.error("API error:", err);
+        document.getElementById("loadingState").classList.add("hidden");
+        alert("เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+      }
+    }
+
+    function selectGalleryImage(imgUrl, element) {
+      document.getElementById("productImage").src = imgUrl;
+      // Highlight selected thumbnail border
+      document.querySelectorAll(".gallery-thumb").forEach(el => el.classList.remove("border-white"));
+      if (element) {
+        element.classList.add("border-white");
+      }
+    }
+
+    function renderData(data) {
+      document.getElementById("productTitle").innerText = data.title || "-";
+      document.getElementById("productBrand").innerText = data.brand || "Brand";
+      document.getElementById("productLocation").innerText = data.shop_location || "Thailand";
+      document.getElementById("productCategory").innerText = data.category_path || "-";
+      document.getElementById("shopIdVal").innerText = data.shop_id || "-";
+      document.getElementById("itemIdVal").innerText = data.item_id || "-";
+      
+      // Price & Discount
+      document.getElementById("metricPrice").innerText = data.price || "฿0.00";
+      const discount = data.discount_percentage || 20;
+      document.getElementById("metricDiscount").innerText = "-" + discount + "% OFF";
+      document.getElementById("badgeDiscount").innerText = "-" + discount + "%";
+
+      // Ratings & Reviews
+      document.getElementById("metricRating").innerHTML = `${data.rating_star || '4.9'} <span class="text-xs font-normal text-amber-400">★</span>`;
+      document.getElementById("metricReviews").innerText = `${data.rating_count || '1,000'} รีวิว`;
+      document.getElementById("metricSold").innerText = data.historical_sold || "10,000+";
+
+      // Commission Rate & Earnings
+      document.getElementById("metricCommission").innerText = data.commission_rate || "10.0%";
+      document.getElementById("metricEarnings").innerText = `+ ${data.commission_earnings || '฿50.00'} / order`;
+
+      // Main Image
+      if (data.main_image_url) {
+        document.getElementById("productImage").src = data.main_image_url;
+      }
+
+      // Shop Type Badge
+      if (data.is_official_shop) {
+        document.getElementById("badgeShopType").innerText = "SHOPEE MALL";
+        document.getElementById("badgeShopType").className = "absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-black/80 border border-neutral-700 text-[10px] font-mono text-neutral-200";
+      } else {
+        document.getElementById("badgeShopType").innerText = "VERIFIED SELLER";
+        document.getElementById("badgeShopType").className = "absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-black/80 border border-neutral-700 text-[10px] font-mono text-neutral-400";
+      }
+
+      // Variation Summary
+      const summary = data.summary || {};
+      const inStock = summary.in_stock_variations || 0;
+      const total = summary.total_variations || 0;
+      const outStock = summary.out_of_stock_variations || 0;
+
+      document.getElementById("inStockCount").innerText = inStock;
+      document.getElementById("outStockCount").innerText = outStock;
+      document.getElementById("metricVariations").innerText = `${inStock} / ${total}`;
+      document.getElementById("metricVariationsSub").innerText = `${outStock} Sold Out`;
+      document.getElementById("variationHeaderTitle").innerText = `SKU Inventory Breakdown (${total} Variations)`;
+
+      // Render Table
+      const tbody = document.getElementById("variationTableBody");
+      tbody.innerHTML = "";
+
+      const variations = data.variations || [];
+      variations.forEach((v, index) => {
+        const isAvail = v.status === "IN_STOCK" || v.is_available;
+        const row = document.createElement("tr");
+        row.className = "hover:bg-[#121212] transition";
+        row.innerHTML = `
+          <td class="py-2.5 text-neutral-600 font-mono">${String(index + 1).padStart(2, '0')}</td>
+          <td class="py-2.5 font-medium ${isAvail ? 'text-neutral-200' : 'text-neutral-500 line-through'}">
+            ${v.name}
+          </td>
+          <td class="py-2.5">
+            ${
+              isAvail 
+                ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono bg-neutral-900 border border-neutral-700 text-neutral-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span> IN STOCK
+                   </span>`
+                : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono bg-[#111111] border border-neutral-800 text-neutral-500">
+                    ✕ SOLD OUT
+                   </span>`
+            }
+          </td>
+          <td class="py-2.5 text-right font-mono ${isAvail ? 'text-neutral-300' : 'text-neutral-600'}">
+            ${isAvail ? v.stock + ' pcs' : '0'}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // Render All Product Images Gallery
+      const galleryGrid = document.getElementById("galleryGrid");
+      galleryGrid.innerHTML = "";
+      const galleryImgs = data.gallery_images || [];
+      document.getElementById("galleryCountBadge").innerText = `${galleryImgs.length} Images Found`;
+
+      galleryImgs.forEach((imgUrl, i) => {
+        const item = document.createElement("div");
+        item.className = `gallery-thumb aspect-square rounded-lg bg-black border ${i === 0 ? 'border-white' : 'border-[#222222]'} hover:border-neutral-400 overflow-hidden cursor-pointer transition relative group`;
+        item.onclick = () => selectGalleryImage(imgUrl, item);
+        item.innerHTML = `
+          <img src="${imgUrl}" referrerpolicy="no-referrer" alt="Thumbnail ${i+1}" class="w-full h-full object-cover group-hover:scale-110 transition duration-200">
+          <span class="absolute bottom-1 right-1 px-1 rounded bg-black/85 text-[9px] font-mono text-neutral-300">#${i+1}</span>
+        `;
+        galleryGrid.appendChild(item);
+      });
+
+      // Reset Watchlist Button
+      const btn = document.getElementById("btnWatchlist");
+      btn.innerHTML = `<i data-lucide="plus" class="w-3.5 h-3.5"></i> TRACK THIS PRODUCT`;
+      btn.className = "w-full py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-700 text-xs font-mono font-semibold flex items-center justify-center gap-2 transition";
+
+      lucide.createIcons();
+      renderMonochromeChart(data);
+    }
+
+    function renderMonochromeChart(data) {
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      const idSeed = parseInt((data.item_id || "12345").slice(-3)) || 120;
+      const base = 25 + (idSeed % 40);
+      const salesData = [
+        base,
+        base + (idSeed % 15) - 5,
+        base + (idSeed % 20),
+        base + 12,
+        base + 8,
+        base + 22,
+        base + 14
+      ];
+      const avg = Math.round(salesData.reduce((a, b) => a + b, 0) / 7);
+      document.getElementById("chartRunRateTag").innerText = `Avg. ${avg} units / day`;
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['7d ago', '6d ago', '5d ago', '4d ago', '3d ago', 'Yesterday', 'Today'],
+          datasets: [
+            {
+              label: 'Daily Sales (Units)',
+              data: salesData,
+              borderColor: '#ffffff',
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              borderWidth: 1.5,
+              fill: true,
+              tension: 0.3,
+              pointBackgroundColor: '#ffffff',
+              pointRadius: 2.5,
+              pointHoverRadius: 5
+            },
+            {
+              label: 'Stock Depletion Rate',
+              data: [salesData[0] * 4, salesData[1] * 3.6, salesData[2] * 3.2, salesData[3] * 2.8, salesData[4] * 2.4, salesData[5] * 2.0, salesData[6] * 1.8],
+              borderColor: '#525252',
+              borderDash: [4, 4],
+              borderWidth: 1.2,
+              fill: false,
+              tension: 0.2,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { 
+                color: '#737373', 
+                font: { size: 10, family: 'Geist Mono' } 
+              }
+            },
+            tooltip: {
+              backgroundColor: '#0a0a0a',
+              titleColor: '#ffffff',
+              bodyColor: '#a3a3a3',
+              borderColor: '#262626',
+              borderWidth: 1,
+              padding: 10,
+              titleFont: { family: 'Geist Mono', size: 11 },
+              bodyFont: { family: 'Geist Mono', size: 11 }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: { color: '#525252', font: { family: 'Geist Mono', size: 9 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: { color: '#525252', font: { family: 'Geist Mono', size: 9 } }
+            }
+          }
+        }
+      });
+    }
+
+    function toggleWatchlist() {
+      const btn = document.getElementById("btnWatchlist");
+      btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-white"></i> TRACKED IN WATCHLIST`;
+      btn.classList.add("bg-white", "text-black", "border-white");
+      btn.classList.remove("bg-neutral-900", "text-neutral-200");
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
